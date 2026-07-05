@@ -1,0 +1,873 @@
+/* ===== Tokens ===== */
+:root{
+  --bg: #16101f;
+  --bg-alt: #1d1626;
+  --panel: #221b2c;
+  --panel-border: rgba(255,255,255,0.06);
+  --text: #f5f2fa;
+  --muted: #a898bd;
+  --grad-start: #ff3d81;
+  --grad-end: #ff8a3d;
+  --blue: #6fa8ff;
+  --radius-lg: 28px;
+  --radius-md: 18px;
+  --font-display: 'Baloo 2', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+
+body{
+  background: radial-gradient(circle at 50% -10%, #2a1e38, var(--bg) 60%);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  padding: 24px 0 0;
+}
+
+button{ font-family: inherit; border:none; cursor:pointer; background:none; color:inherit; }
+input{ font-family: inherit; }
+
+.app{
+  width:100%;
+  max-width: 430px;
+  min-height: 100vh;
+  padding: 0 18px 90px;
+  position:relative;
+}
+
+/* ===== Top bar ===== */
+.topbar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.icon-btn.grid-btn{
+  display:grid;
+  grid-template-columns: repeat(3,4px);
+  grid-template-rows: repeat(3,4px);
+  gap:3px;
+  width:34px; height:34px;
+  place-items:center;
+  flex-shrink:0;
+}
+.grid-btn span{ width:4px; height:4px; border-radius:50%; background: var(--muted); }
+
+.search-wrap{
+  position:relative;
+  flex:1;
+}
+
+.search{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background: var(--panel);
+  border:1px solid var(--panel-border);
+  padding:10px 14px;
+  border-radius: 999px;
+  color: var(--muted);
+}
+.search input{
+  background:none;
+  border:none;
+  outline:none;
+  color: var(--text);
+  width:100%;
+  font-size:14px;
+}
+.search input::placeholder{ color: var(--muted); }
+
+/* ---- Search suggestions dropdown ---- */
+.search-results{
+  position:absolute;
+  top: calc(100% + 8px);
+  left:0;
+  right:0;
+  background: var(--panel);
+  border:1px solid var(--panel-border);
+  border-radius: 16px;
+  overflow:hidden;
+  z-index:20;
+  box-shadow: 0 16px 30px -10px rgba(0,0,0,0.5);
+  display:none;
+}
+.search-results.open{ display:block; }
+
+.search-result-item{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  width:100%;
+  padding:12px 16px;
+  text-align:left;
+  border-bottom:1px solid var(--panel-border);
+}
+.search-result-item:last-child{ border-bottom:none; }
+.search-result-item:hover{ background: rgba(255,255,255,0.05); }
+.search-result-item .r-name{ font-size:14px; font-weight:600; color:var(--text); }
+.search-result-item .r-region{ font-size:12px; color:var(--muted); margin-top:2px; }
+
+.search-result-empty,
+.search-result-loading{
+  padding:14px 16px;
+  font-size:13px;
+  color: var(--muted);
+}
+
+.avatar-wrap{ position:relative; flex-shrink:0; }
+
+.avatar-btn{
+  position:relative;
+  width:38px; height:38px;
+  border-radius:50%;
+  background: var(--bg-alt);
+  flex-shrink:0;
+  font-size:19px;
+  transition: transform 0.2s ease;
+  overflow:hidden;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.12);
+}
+.avatar-btn svg, .avatar-btn img{
+  position:absolute;
+  inset:0;
+  width:100%; height:100%;
+  border-radius:50%;
+  object-fit:cover;
+  display:block;
+}
+.avatar-btn:active{ transform: scale(0.92); }
+
+.avatar-picker{
+  position:absolute;
+  top: calc(100% + 10px);
+  right:0;
+  width:220px;
+  background: var(--panel);
+  border:1px solid var(--panel-border);
+  border-radius:18px;
+  padding:14px;
+  box-shadow: 0 16px 30px -10px rgba(0,0,0,0.5);
+  z-index:30;
+  display:none;
+}
+.avatar-picker.open{ display:block; }
+.avatar-picker-title{ font-size:12px; color:var(--muted); margin-bottom:10px; }
+.avatar-grid{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:8px;
+}
+.avatar-option{
+  position:relative;
+  width:44px; height:44px;
+  border-radius:50%;
+  background: var(--bg-alt);
+  border:2px solid transparent;
+  overflow:hidden;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.avatar-option svg, .avatar-option img{
+  position:absolute;
+  inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+}
+.avatar-option:hover{ transform: scale(1.06); }
+.avatar-option.selected{
+  border-color: rgba(255,255,255,0.65);
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.15);
+}
+
+/* ===== Weather card ===== */
+.weather-card{
+  position:relative;
+  overflow:visible;
+}
+
+/* The colored shape itself — clipped into the diagonal notch seen in the
+   reference design, so the icon can visually "escape" past that edge.
+   Uses its own --card-grad-* variables (rather than the global
+   --grad-start/--grad-end) so the mood classes below can retint just
+   this card without affecting tabs/buttons elsewhere in the app. */
+.card-shape{
+  position:absolute;
+  inset:0;
+  background: linear-gradient(150deg, var(--card-grad-start, var(--grad-start)), var(--card-grad-end, var(--grad-end)), var(--card-grad-start, var(--grad-start)));
+  background-size: 200% 200%;
+  animation: gradientShift 10s ease-in-out infinite;
+  clip-path: url(#cardNotchClip);
+  /* Neutral, uncolored shadow — a colored drop-shadow here would pick up
+     the gradient's hue and "leak" a visible tinted sliver past the
+     diagonal cut, which is the artifact we're fixing. */
+  filter: drop-shadow(0 16px 26px rgba(10,6,16,0.4));
+  z-index:0;
+}
+
+/* Soft glossy highlight for extra polish — a faint light sweep in the
+   top-left, sitting above the gradient but below the text content. */
+.card-shape::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: radial-gradient(120% 80% at 12% 0%, rgba(255,255,255,0.28), transparent 55%);
+  mix-blend-mode: soft-light;
+  pointer-events:none;
+}
+
+/* ---- Card mood palettes — swapped by JS based on temperature/condition ----
+   mood-hot:   warm sunny day  (pink -> orange)   — the reference design
+   mood-mild:  pleasant/cloudy (violet -> pink)
+   mood-cold:  cold/snow       (blue -> violet)
+   mode-storm: storm/high wind (near-black, see below) */
+.weather-card.mood-hot{  --card-grad-start:#ff3d81; --card-grad-end:#ff8a3d; }
+.weather-card.mood-mild{ --card-grad-start:#8a4fff; --card-grad-end:#ff4fa3; }
+.weather-card.mood-cold{ --card-grad-start:#2ec5ff; --card-grad-end:#7c5cff; }
+
+@keyframes gradientShift{
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .card-shape{ animation: none; }
+}
+
+/* ---- Storm mode: triggered from JS when it's stormy or very windy.
+   The gradient shifts from the sunny pink/orange to a stormy near-black
+   gradient, and a brief white flash (lightning) sweeps across the card
+   on a loose, irregular loop. ---- */
+.weather-card.mode-storm .card-shape{
+  background: linear-gradient(150deg, #0d0d18, #1c1a2e, #0a0a13, #1c1a2e);
+  background-size: 200% 200%;
+  filter: drop-shadow(0 20px 34px rgba(10,10,20,0.55));
+}
+
+.weather-card.mode-storm .card-shape::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,0.85) 50%, transparent 60%);
+  opacity:0;
+  animation: lightningFlash 6.5s infinite;
+}
+
+@keyframes lightningFlash{
+  0%, 88%, 100% { opacity:0; }
+  89%           { opacity:0.5; }
+  90%           { opacity:0.05; }
+  91%           { opacity:0.35; }
+  92%           { opacity:0; }
+}
+
+.storm-bolts{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  opacity:0;
+  transition: opacity 0.5s ease;
+}
+.weather-card.mode-storm .storm-bolts{ opacity:1; }
+
+.storm-bolts .bolt{
+  position:absolute;
+  width:26px; height:26px;
+  color:#ffe98a;
+  filter: drop-shadow(0 0 8px rgba(255,233,138,0.8));
+  animation: boltFlicker 6.5s infinite;
+}
+.storm-bolts .bolt-1{ top:22%; left:14%; animation-delay:0.1s; }
+.storm-bolts .bolt-2{ top:55%; left:28%; width:18px; height:18px; animation-delay:0.35s; }
+
+@keyframes boltFlicker{
+  0%, 87%, 93%, 100% { opacity:0; transform:scale(0.85); }
+  89% { opacity:1; transform:scale(1.05); }
+  91% { opacity:0.3; transform:scale(0.95); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .weather-card.mode-storm .card-shape::after,
+  .storm-bolts .bolt{ animation: none; opacity:0; }
+}
+
+.card-content{
+  position:relative;
+  z-index:2;
+  padding: 26px 24px 30px;
+}
+
+.card-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+
+.city-name{
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight:700;
+}
+
+.date{
+  font-size:13px;
+  opacity:0.85;
+  margin-top:4px;
+}
+
+.refresh-btn{
+  width:38px; height:38px;
+  border-radius:50%;
+  background: rgba(255,255,255,0.18);
+  display:flex; align-items:center; justify-content:center;
+  transition: transform 0.4s ease;
+}
+.refresh-btn:active{ transform: rotate(180deg); }
+
+.card-mid{
+  margin-top:18px;
+  max-width:62%;
+}
+
+.temp-block{ display:flex; flex-direction:column; }
+
+.temp-row{ display:inline-flex; align-items:flex-start; }
+
+.temp-value{
+  font-family: var(--font-display);
+  font-size: 72px;
+  font-weight:800;
+  line-height:1;
+}
+.temp-deg{
+  font-size:30px;
+  font-weight:700;
+  line-height:1;
+  margin-top:6px;
+  margin-left:2px;
+}
+
+.temp-minmax{
+  font-size:13px;
+  font-weight:600;
+  opacity:0.9;
+  margin-top:6px;
+}
+
+/* The illustration overflows past the card's bottom-right edge on purpose,
+   sitting over the diagonal cut and spilling into the dark area below —
+   matching the reference design exactly. */
+.weather-icon{
+  position:absolute;
+  right:-10px;
+  bottom:-52px;
+  width: 190px;
+  height: 190px;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  animation: float 4.5s ease-in-out infinite;
+  filter: drop-shadow(0 14px 16px rgba(0,0,0,0.32));
+  transition: filter 0.6s ease;
+}
+.weather-icon svg{ width:100%; height:100%; overflow:visible; }
+
+@keyframes float{
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-8px) rotate(-3deg); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .weather-icon{ animation: none; }
+}
+
+/* ===== Stats strip ===== */
+.stats-strip{
+  position:relative;
+  z-index:1;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:26px;
+  background: var(--panel);
+  border:1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding:14px 16px;
+}
+
+.stat{ display:flex; align-items:center; gap:10px; }
+.stat-icon{
+  width:38px; height:38px;
+  border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px;
+  flex-shrink:0;
+}
+.stat-icon--blue{ background: rgba(111,168,255,0.16); }
+.stat-icon--cyan{ background: rgba(94,222,213,0.16); }
+.stat-icon--purple{ background: rgba(186,120,255,0.16); }
+.stat-label{ font-size:11px; color: var(--muted); }
+.stat-value{ font-size:14px; font-weight:600; }
+
+/* ===== City tabs ===== */
+.city-tabs{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:22px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.city-tabs::-webkit-scrollbar{ display:none; }
+
+.tab{
+  padding:9px 18px;
+  border-radius:999px;
+  background: var(--panel);
+  border:1px solid var(--panel-border);
+  color: var(--muted);
+  font-size:14px;
+  font-weight:600;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.tab.active{
+  color:#fff;
+  border:1px solid transparent;
+  background:
+    linear-gradient(var(--bg), var(--bg)) padding-box,
+    linear-gradient(135deg, var(--grad-start), var(--grad-end)) border-box;
+}
+
+.tab{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.tab .tab-remove{
+  font-size:14px;
+  line-height:1;
+  color: var(--muted);
+  opacity:0.7;
+}
+.tab .tab-remove:hover{ opacity:1; color:#fff; }
+
+.tab-add{
+  width:34px; height:34px;
+  border-radius:50%;
+  background: var(--panel);
+  border:1px solid var(--panel-border);
+  color: var(--muted);
+  font-size:18px;
+  flex-shrink:0;
+}
+
+/* ===== Day / resolution toggles row ===== */
+.toggles-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:22px;
+  flex-wrap:wrap;
+}
+
+.day-toggle{
+  display:flex;
+  gap:24px;
+  border-bottom:1px solid var(--panel-border);
+}
+.day-btn{
+  padding-bottom:10px;
+  font-size:15px;
+  color: var(--muted);
+  font-weight:600;
+  border-bottom:2px solid transparent;
+}
+.day-btn.active{
+  color:#fff;
+  border-color: var(--grad-start);
+}
+
+.res-toggle{
+  display:flex;
+  background: var(--panel);
+  border:1px solid var(--panel-border);
+  border-radius:999px;
+  padding:3px;
+  gap:2px;
+}
+.res-btn{
+  padding:6px 14px;
+  font-size:12px;
+  font-weight:600;
+  color: var(--muted);
+  border-radius:999px;
+}
+.res-btn.active{
+  color:#fff;
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+}
+
+/* ===== Hourly carousel — auto-scrolls, but the user can also drag it
+   back and forth manually at any time ===== */
+.hourly-carousel{
+  margin-top:16px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  position:relative;
+  cursor:grab;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+}
+.hourly-carousel::-webkit-scrollbar{ display:none; }
+.hourly-carousel.dragging{ cursor:grabbing; }
+
+.hourly-track{
+  display:flex;
+  gap:12px;
+  width: max-content;
+  will-change: transform;
+}
+
+.hour-card{
+  position:relative;
+  flex-shrink:0;
+  width:92px;
+  padding:16px 8px 14px;
+  text-align:left;
+  transition: transform 0.2s ease;
+}
+.hour-card:hover{ transform: translateY(-4px); }
+
+/* The bubble's colored/glass background, clipped into the chamfered
+   top-right corner shape. Kept as its own layer (rather than putting the
+   clip-path directly on .hour-card) so filter: drop-shadow can cast a
+   shadow that follows the cut shape instead of a plain rectangle. */
+.hour-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  clip-path: url(#hourNotchClip);
+  background:
+    radial-gradient(120% 90% at 15% 0%, rgba(255,255,255,0.14), transparent 55%),
+    linear-gradient(165deg, #2b2438, #1a1522 75%);
+  border:1px solid var(--panel-border);
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.35));
+  transition: border-color 0.2s ease;
+}
+.hour-card:hover::before{ border-color: rgba(255,255,255,0.18); }
+
+.hour-time{ position:relative; z-index:1; font-size:12px; color: var(--muted); }
+
+.hour-temp{ position:relative; z-index:1; margin:10px 0 8px; line-height:1; }
+.hour-temp-value{ font-family: var(--font-display); font-size:30px; font-weight:800; color:var(--text); }
+.hour-temp-deg{ font-family: var(--font-display); font-size:15px; font-weight:700; color:var(--text); vertical-align: top; margin-left:1px; }
+
+.hour-icon{ position:relative; z-index:1; width:44px; height:44px; margin:0 auto; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.25)); }
+.hour-icon svg{ width:100%; height:100%; overflow:visible; }
+
+/* ===== Weather-icon micro-animations =====
+   Shared by every icon builder (main hero icon + hourly bubbles + both
+   icon packs) since they all emit the same class names. Kept subtle on
+   purpose — this is ambient motion, not attention-grabbing. Rotations/
+   scales use transform-origin:50px 50px because the icons live in a
+   0 0 100 100 viewBox, so that point is always the icon's true center. */
+.icon-rays{
+  transform-origin: 50px 50px;
+  animation: iconRaysSpin 18s linear infinite;
+}
+.icon-sun-core{
+  transform-origin: 50px 50px;
+  animation: iconSunPulse 3.5s ease-in-out infinite;
+}
+.icon-moon{
+  animation: iconMoonGlow 4s ease-in-out infinite;
+}
+.icon-cloud-float-front{
+  animation: iconCloudFloat 4s ease-in-out infinite;
+}
+.icon-cloud-float-back{
+  animation: iconCloudFloat 5s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+.icon-raindrop{
+  animation: iconRainFall 1.1s linear infinite;
+}
+.icon-snowflake{
+  animation: iconSnowDrift 4s ease-in-out infinite;
+}
+.icon-fog-line{
+  animation: iconFogDrift 5s ease-in-out infinite;
+}
+.icon-bolt{
+  transform-origin: 50px 78px;
+  animation: iconBoltGlow 2.6s ease-in-out infinite;
+}
+
+@keyframes iconRaysSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+@keyframes iconSunPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.05); } }
+@keyframes iconMoonGlow{ 0%,100%{ opacity:1; } 50%{ opacity:0.82; } }
+@keyframes iconCloudFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }
+@keyframes iconRainFall{
+  0%   { transform:translateY(-3px); opacity:0; }
+  25%  { opacity:1; }
+  80%  { opacity:0.7; }
+  100% { transform:translateY(9px); opacity:0; }
+}
+@keyframes iconSnowDrift{
+  0%,100%{ transform:translate(0,0); }
+  50%    { transform:translate(2px,4px); }
+}
+@keyframes iconFogDrift{
+  0%,100%{ transform:translateX(0); }
+  50%    { transform:translateX(4px); }
+}
+@keyframes iconBoltGlow{
+  0%,100%{ opacity:1;   filter:drop-shadow(0 0 0 rgba(255,210,110,0)); }
+  50%    { opacity:0.75; filter:drop-shadow(0 0 4px rgba(255,210,110,0.75)); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .icon-rays, .icon-sun-core, .icon-moon, .icon-cloud-float-front,
+  .icon-cloud-float-back, .icon-raindrop, .icon-snowflake,
+  .icon-fog-line, .icon-bolt{ animation:none; }
+}
+
+.status-msg{
+  margin-top:16px;
+  font-size:13px;
+  color: var(--muted);
+  text-align:center;
+}
+
+/* ===== Bottom nav ===== */
+.bottom-nav{
+  position:fixed;
+  bottom:16px;
+  left:50%;
+  transform: translateX(-50%);
+  width:calc(100% - 36px);
+  max-width: 394px;
+  background: var(--panel);
+  border:1px solid var(--panel-border);
+  border-radius: 999px;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  padding:12px 10px;
+  backdrop-filter: blur(10px);
+}
+.nav-btn{
+  width:40px; height:40px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  color: var(--muted);
+}
+.nav-btn.active{
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+  color:#fff;
+}
+
+/* ===== Overlay (shared by side panel + favorites sheet) ===== */
+.overlay{
+  position:fixed;
+  inset:0;
+  background: rgba(8,5,12,0.55);
+  backdrop-filter: blur(2px);
+  z-index:40;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity 0.25s ease;
+}
+.overlay.open{ opacity:1; pointer-events:auto; }
+
+/* ===== Settings side panel ===== */
+.side-panel{
+  position:fixed;
+  top:0; right:0;
+  height:100%;
+  width:min(320px, 84vw);
+  background: var(--bg-alt);
+  border-left:1px solid var(--panel-border);
+  padding:26px 22px;
+  z-index:50;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  overflow-y:auto;
+}
+.side-panel.open{ transform: translateX(0); }
+
+.side-panel-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:24px;
+}
+.side-panel-head h2{ font-family: var(--font-display); font-size:20px; }
+
+.panel-close{
+  width:32px; height:32px;
+  border-radius:50%;
+  background: var(--panel);
+  color: var(--text);
+  font-size:14px;
+  display:flex; align-items:center; justify-content:center;
+}
+
+.setting-block{ margin-bottom:22px; }
+.setting-label{ font-size:13px; color: var(--muted); margin-bottom:10px; }
+
+.segmented{
+  display:flex;
+  background: var(--panel);
+  border:1px solid var(--panel-border);
+  border-radius:999px;
+  padding:3px;
+  gap:2px;
+}
+.seg-btn{
+  flex:1;
+  padding:8px 0;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:600;
+  color: var(--muted);
+  text-align:center;
+}
+.seg-btn.active{
+  color:#fff;
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+}
+
+/* ===== Favorites bottom sheet ===== */
+.sheet{
+  position:fixed;
+  left:50%;
+  bottom:0;
+  width:100%;
+  max-width:430px;
+  transform: translate(-50%, 100%);
+  background: var(--bg-alt);
+  border:1px solid var(--panel-border);
+  border-radius: 24px 24px 0 0;
+  padding:22px 20px 26px;
+  z-index:50;
+  transition: transform 0.3s ease;
+  max-height:70vh;
+  overflow-y:auto;
+}
+.sheet.open{ transform: translate(-50%, 0); }
+
+.sheet-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+}
+.sheet-head h2{ font-family: var(--font-display); font-size:19px; }
+
+.favorites-list{ display:flex; flex-direction:column; gap:10px; }
+.favorite-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background: var(--panel);
+  border:1px solid var(--panel-border);
+  border-radius:16px;
+  padding:12px 16px;
+}
+.favorite-row.active{ border-color: var(--grad-start); }
+.favorite-name{ font-size:14px; font-weight:600; }
+.favorite-sub{ font-size:12px; color: var(--muted); margin-top:2px; }
+.favorite-remove{
+  color: var(--muted);
+  font-size:14px;
+  padding:4px 8px;
+}
+.favorite-remove:hover{ color:#fff; }
+.favorites-empty{ font-size:13px; color: var(--muted); text-align:center; padding:20px 0; }
+
+/* ===== Light theme override ===== */
+body.theme-light{
+  background: radial-gradient(circle at 50% -10%, #f3edf9, #ece3f5 60%);
+  color:#241c33;
+}
+body.theme-light{
+  --bg: #ece3f5;
+  --bg-alt: #f6f1fb;
+  --panel: #ffffff;
+  --panel-border: rgba(30,20,45,0.08);
+  --text: #241c33;
+  --muted: #746a86;
+}
+body.theme-light .bottom-nav,
+body.theme-light .side-panel,
+body.theme-light .sheet{
+  box-shadow: 0 10px 30px -12px rgba(60,30,80,0.18);
+}
+
+/* ===========================================================
+   MOBILE (default above ~ up to 600px) fine-tuning
+   =========================================================== */
+@media (max-width: 480px){
+  .temp-value{ font-size: 56px; }
+  .temp-deg{ font-size:24px; }
+  .weather-icon{ width: 150px; height: 150px; right:-8px; bottom:-36px; }
+  .city-name{ font-size: 24px; }
+  .card-mid{ max-width: 58%; }
+}
+
+/* ===========================================================
+   DESKTOP — distinct two-column layout, no phone-frame feel
+   =========================================================== */
+@media (min-width: 900px){
+  body{ padding-top: 48px; align-items:flex-start; }
+
+  .app{
+    max-width: 1100px;
+    padding: 0 40px 60px;
+  }
+
+  .topbar{ margin-bottom:32px; }
+  .search{ max-width: 420px; }
+
+  .main-grid{
+    display:grid;
+    grid-template-columns: 400px 1fr;
+    grid-template-areas:
+      "card    tabs"
+      "card    toggle"
+      "stats   hourly"
+      "status  hourly";
+    column-gap: 32px;
+    row-gap: 20px;
+    align-items:start;
+  }
+
+  .weather-card{ grid-area: card; }
+  .card-content{ padding: 34px 30px 38px; }
+  .stats-strip{ grid-area: stats; flex-direction:column; align-items:flex-start; gap:14px; }
+  .city-tabs{ grid-area: tabs; margin-top:0; }
+  .toggles-row{ grid-area: toggle; margin-top:0; }
+  .hourly-carousel{
+    grid-area: hourly;
+    margin-top:0;
+    align-self:start;
+  }
+  .status-msg{ grid-area: status; text-align:left; }
+
+  .temp-value{ font-size: 84px; }
+  .weather-icon{ width: 215px; height: 215px; right:-14px; bottom:-58px; }
+
+  .bottom-nav{ display:none; } /* desktop uses a persistent layout, no need for mobile tab bar */
+}
