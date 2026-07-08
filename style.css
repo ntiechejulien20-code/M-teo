@@ -775,4 +775,241 @@ input{ font-family: inherit; }
 
 .sheet-head{
   display:flex;
-  justify-content:sp
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+}
+.sheet-head h2{ font-family: var(--font-display); font-size:19px; }
+
+.favorites-list{ display:flex; flex-direction:column; gap:10px; }
+.favorite-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background: var(--panel);
+  border:1px solid var(--panel-border);
+  border-radius:16px;
+  padding:12px 16px;
+}
+.favorite-row.active{ border-color: var(--grad-start); }
+.favorite-name{ font-size:14px; font-weight:600; }
+.favorite-sub{ font-size:12px; color: var(--muted); margin-top:2px; }
+.favorite-remove{
+  color: var(--muted);
+  font-size:14px;
+  padding:4px 8px;
+}
+.favorite-remove:hover{ color: var(--text); }
+.favorites-empty{ font-size:13px; color: var(--muted); text-align:center; padding:20px 0; }
+
+/* ===== Light theme override ===== */
+body.theme-light{
+  background: radial-gradient(circle at 50% -10%, #f3edf9, #ece3f5 60%);
+  color:#241c33;
+}
+body.theme-light{
+  --bg: #ece3f5;
+  --bg-alt: #f6f1fb;
+  --panel: #ffffff;
+  --panel-border: rgba(30,20,45,0.08);
+  --text: #241c33;
+  --muted: #746a86;
+}
+body.theme-light .bottom-nav,
+body.theme-light .side-panel,
+body.theme-light .sheet{
+  box-shadow: 0 10px 30px -12px rgba(60,30,80,0.18);
+}
+
+/* Anneau de l'avatar : blanc translucide invisible sur fond clair */
+body.theme-light .avatar-btn{
+  box-shadow: 0 0 0 2px rgba(36,28,51,0.12);
+}
+
+/* Survol des résultats de recherche : trop faible sur panneau blanc */
+body.theme-light .search-result-item:hover{
+  background: rgba(36,28,51,0.045);
+}
+
+/* Cartes de prévisions horaires : le fond violet foncé était codé en dur
+   et ne s'adaptait jamais au thème clair, rendant le texte illisible. */
+body.theme-light .hour-card::before{
+  background:
+    radial-gradient(120% 90% at 15% 0%, rgba(255,255,255,0.7), transparent 55%),
+    linear-gradient(165deg, #ffffff, #f3edf9 75%);
+  border-color: rgba(36,28,51,0.08);
+  filter: drop-shadow(0 10px 18px rgba(60,30,80,0.12));
+}
+body.theme-light .hour-card:hover::before{ border-color: rgba(36,28,51,0.2); }
+
+/* ===========================================================
+   MOBILE (default above ~ up to 600px) fine-tuning
+   =========================================================== */
+@media (max-width: 480px){
+  .temp-value{ font-size: 56px; }
+  .temp-deg{ font-size:24px; }
+  .weather-icon{ width: 150px; height: 150px; right:-8px; bottom:-36px; }
+  .city-name{ font-size: 24px; }
+  .card-mid{ max-width: 58%; }
+}
+
+/* ---- Very small phones (iPhone SE / 5, old Android <=360px):
+   the mobile tuning above still leaves the icon and the temperature
+   text too close together, so tighten things up one more notch. ---- */
+@media (max-width: 360px){
+  .app{ padding-left:14px; padding-right:14px; }
+  .card-content{ padding: 22px 18px 26px; }
+  .temp-value{ font-size: 46px; }
+  .weather-icon{ width: 118px; height: 118px; right:-4px; bottom:-22px; }
+  .city-name{ font-size: 20px; }
+  .day-toggle{ gap:16px; }
+  .hour-card{ width:82px; }
+}
+
+/* ---- Short viewports (phones in landscape, or split-screen):
+   fixed vertical chrome (bottom nav, floating avatar/search panels)
+   eats a much bigger share of the screen here, so trim it down. ---- */
+@media (max-height: 480px) and (orientation: landscape){
+  body{ padding-top:14px; }
+  .app{ padding-bottom: calc(74px + env(safe-area-inset-bottom)); }
+  .topbar{ margin-bottom:14px; }
+  .card-content{ padding:18px 22px 22px; }
+  .weather-icon{ transform:scale(0.75); transform-origin:bottom right; }
+  .stats-strip{ margin-top:14px; padding:10px 14px; }
+  .city-tabs{ margin-top:14px; }
+  .toggles-row{ margin-top:14px; }
+  .hourly-carousel{ margin-top:10px; }
+  .bottom-nav{ padding:6px 10px; }
+  .nav-btn{ width:38px; height:38px; }
+  .side-panel, .sheet{ max-height:100vh; overflow-y:auto; }
+}
+
+/* ===========================================================
+   TABLETS (portrait) — 600–899px. Below this the site was just
+   showing the 430px phone card centered in a lot of empty space;
+   this widens the frame and scales the hero card and grid children
+   proportionally so the layout actually uses the extra width.
+   =========================================================== */
+@media (min-width: 600px) and (max-width: 899px){
+  .app{ max-width: 640px; padding: 0 32px calc(90px + env(safe-area-inset-bottom)); }
+
+  .card-content{ padding: 34px 36px 38px; }
+  .city-name{ font-size: 30px; }
+  .temp-value{ font-size: 90px; }
+  .temp-deg{ font-size: 32px; }
+  .weather-icon{ width: 220px; height: 220px; right:-10px; bottom:-46px; }
+  .card-mid{ max-width: 55%; }
+
+  .stats-strip{ padding:18px 22px; }
+  .stat-icon{ width:42px; height:42px; }
+  .stat-label{ font-size:12px; }
+  .stat-value{ font-size:15px; }
+
+  .tab{ padding:10px 20px; font-size:15px; }
+
+  .hour-card{ width:104px; }
+  .hour-temp-value{ font-size:32px; }
+  .hour-icon{ width:48px; height:48px; }
+
+  .bottom-nav{ max-width: 460px; }
+}
+
+/* ===========================================================
+   DESKTOP — distinct two-column layout, no phone-frame feel.
+   Sizes use clamp() so everything scales smoothly with the
+   viewport instead of jumping abruptly at the breakpoint, and
+   every component (not just the hero card) is scaled up so the
+   whole page feels proportioned to a large screen.
+   =========================================================== */
+@media (min-width: 900px){
+  body{ padding-top: clamp(48px, 5vw, 64px); align-items:flex-start; }
+
+  .app{
+    max-width: 1360px;
+    padding: 0 clamp(40px, 4vw, 64px) 60px;
+  }
+
+  .topbar{ margin-bottom: clamp(32px, 3vw, 44px); }
+  .search{ max-width: 460px; padding:12px 16px; }
+  .search input{ font-size:15px; }
+  .icon-btn.grid-btn{ width:38px; height:38px; }
+  .avatar-btn{ width:44px; height:44px; font-size:21px; }
+
+  .main-grid{
+    display:grid;
+    grid-template-columns: minmax(420px, 460px) 1fr;
+    grid-template-areas:
+      "card    tabs"
+      "card    toggle"
+      "stats   hourly"
+      "status  hourly";
+    column-gap: clamp(32px, 3vw, 48px);
+    row-gap: 24px;
+    align-items:start;
+  }
+
+  .weather-card{ grid-area: card; }
+  .card-content{ padding: clamp(34px, 3vw, 44px) clamp(30px, 3vw, 38px) 40px; }
+  .city-name{ font-size: clamp(28px, 2.1vw, 32px); }
+  .date{ font-size:14px; }
+  .refresh-btn{ width:42px; height:42px; }
+
+  .stats-strip{ grid-area: stats; flex-direction:column; align-items:flex-start; gap:16px; padding:18px 20px; }
+  .stat-icon{ width:44px; height:44px; border-radius:14px; }
+  .stat-label{ font-size:12px; }
+  .stat-value{ font-size:15px; }
+
+  .city-tabs{ grid-area: tabs; margin-top:0; gap:12px; }
+  .tab{ padding:10px 20px; font-size:15px; }
+  .tab-add{ width:38px; height:38px; font-size:20px; }
+
+  .toggles-row{ grid-area: toggle; margin-top:0; }
+  .day-btn{ font-size:16px; }
+  .res-btn{ padding:7px 16px; font-size:13px; }
+
+  .hourly-carousel{
+    grid-area: hourly;
+    margin-top:0;
+    align-self:start;
+  }
+  .hour-card{ width:108px; padding:18px 10px 16px; }
+  .hour-temp-value{ font-size:32px; }
+  .hour-icon{ width:48px; height:48px; }
+
+  .status-msg{ grid-area: status; text-align:left; font-size:14px; }
+
+  .temp-value{ font-size: clamp(84px, 6vw, 104px); }
+  .temp-deg{ font-size: clamp(30px, 2.4vw, 38px); }
+  .temp-minmax{ font-size:14px; }
+  .weather-icon{ width: clamp(215px, 16vw, 250px); height: clamp(215px, 16vw, 250px); right:-14px; bottom:-58px; }
+
+  /* Settings panel and favorites sheet were sized for a mobile
+     drawer; give them real desktop proportions instead of
+     stretching a narrow mobile panel edge-to-edge. */
+  .side-panel{ width:min(380px, 30vw); padding:32px 28px; }
+  .sheet{
+    left:50%; right:auto; bottom:auto; top:50%;
+    transform: translate(-50%, calc(-50% + 24px));
+    width:min(480px, 90vw);
+    max-height:74vh;
+    border-radius:24px;
+    opacity:0;
+    pointer-events:none;
+    transition: transform 0.3s ease, opacity 0.25s ease;
+  }
+  .sheet.open{ transform: translate(-50%, -50%); opacity:1; pointer-events:auto; }
+
+  .bottom-nav{ display:none; } /* desktop uses a persistent layout, no need for mobile tab bar */
+}
+
+/* ===========================================================
+   LARGE DESKTOP — extra room on big monitors. Capped growth so
+   the layout stays comfortable and doesn't sprawl or feel like
+   a different design; mostly more breathing space, not bigger
+   text everywhere.
+   =========================================================== */
+@media (min-width: 1400px){
+  .app{ max-width: 1480px; }
+  .main-grid{ grid-template-columns: minmax(440px, 480px) 1fr; column-gap:56px; }
+  .hour-card{ width:118px; }
+}
