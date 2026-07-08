@@ -17,14 +17,18 @@
 
 *{box-sizing:border-box; margin:0; padding:0;}
 
+html{ overflow-x:hidden; }
+
 body{
   background: radial-gradient(circle at 50% -10%, #2a1e38, var(--bg) 60%);
   color: var(--text);
   font-family: var(--font-body);
   min-height:100vh;
+  min-height:100dvh;
   display:flex;
   justify-content:center;
   padding: 24px 0 0;
+  overflow-x:hidden;
 }
 
 button{ font-family: inherit; border:none; cursor:pointer; background:none; color:inherit; }
@@ -34,7 +38,8 @@ input{ font-family: inherit; }
   width:100%;
   max-width: 430px;
   min-height: 100vh;
-  padding: 0 18px 90px;
+  min-height: 100dvh;
+  padding: 0 18px calc(90px + env(safe-area-inset-bottom));
   position:relative;
 }
 
@@ -51,7 +56,7 @@ input{ font-family: inherit; }
   grid-template-columns: repeat(3,4px);
   grid-template-rows: repeat(3,4px);
   gap:3px;
-  width:34px; height:34px;
+  width:40px; height:40px;
   place-items:center;
   flex-shrink:0;
 }
@@ -78,7 +83,7 @@ input{ font-family: inherit; }
   outline:none;
   color: var(--text);
   width:100%;
-  font-size:14px;
+  font-size:16px; /* >=16px : évite le zoom automatique au focus sur iOS Safari */
 }
 .search input::placeholder{ color: var(--muted); }
 
@@ -123,11 +128,11 @@ input{ font-family: inherit; }
 
 .avatar-btn{
   position:relative;
-  width:38px; height:38px;
+  width:42px; height:42px;
   border-radius:50%;
   background: var(--bg-alt);
   flex-shrink:0;
-  font-size:19px;
+  font-size:20px;
   transition: transform 0.2s ease;
   overflow:hidden;
   box-shadow: 0 0 0 2px rgba(255,255,255,0.12);
@@ -321,7 +326,7 @@ input{ font-family: inherit; }
 }
 
 .refresh-btn{
-  width:38px; height:38px;
+  width:42px; height:42px;
   border-radius:50%;
   background: rgba(255,255,255,0.18);
   display:flex; align-items:center; justify-content:center;
@@ -459,7 +464,7 @@ input{ font-family: inherit; }
 .tab .tab-remove:hover{ opacity:1; color: var(--text); }
 
 .tab-add{
-  width:34px; height:34px;
+  width:38px; height:38px;
   border-radius:50%;
   background: var(--panel);
   border:1px solid var(--panel-border);
@@ -653,7 +658,7 @@ input{ font-family: inherit; }
 /* ===== Bottom nav ===== */
 .bottom-nav{
   position:fixed;
-  bottom:16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
   left:50%;
   transform: translateX(-50%);
   width:calc(100% - 36px);
@@ -664,11 +669,11 @@ input{ font-family: inherit; }
   display:flex;
   justify-content:space-around;
   align-items:center;
-  padding:12px 10px;
+  padding:8px 10px;
   backdrop-filter: blur(10px);
 }
 .nav-btn{
-  width:40px; height:40px;
+  width:44px; height:44px;
   border-radius:50%;
   display:flex; align-items:center; justify-content:center;
   color: var(--muted);
@@ -716,7 +721,7 @@ input{ font-family: inherit; }
 .side-panel-head h2{ font-family: var(--font-display); font-size:20px; }
 
 .panel-close{
-  width:32px; height:32px;
+  width:36px; height:36px;
   border-radius:50%;
   background: var(--panel);
   color: var(--text);
@@ -770,180 +775,4 @@ input{ font-family: inherit; }
 
 .sheet-head{
   display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:16px;
-}
-.sheet-head h2{ font-family: var(--font-display); font-size:19px; }
-
-.favorites-list{ display:flex; flex-direction:column; gap:10px; }
-.favorite-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  background: var(--panel);
-  border:1px solid var(--panel-border);
-  border-radius:16px;
-  padding:12px 16px;
-}
-.favorite-row.active{ border-color: var(--grad-start); }
-.favorite-name{ font-size:14px; font-weight:600; }
-.favorite-sub{ font-size:12px; color: var(--muted); margin-top:2px; }
-.favorite-remove{
-  color: var(--muted);
-  font-size:14px;
-  padding:4px 8px;
-}
-.favorite-remove:hover{ color: var(--text); }
-.favorites-empty{ font-size:13px; color: var(--muted); text-align:center; padding:20px 0; }
-
-/* ===== Light theme override ===== */
-body.theme-light{
-  background: radial-gradient(circle at 50% -10%, #f3edf9, #ece3f5 60%);
-  color:#241c33;
-}
-body.theme-light{
-  --bg: #ece3f5;
-  --bg-alt: #f6f1fb;
-  --panel: #ffffff;
-  --panel-border: rgba(30,20,45,0.08);
-  --text: #241c33;
-  --muted: #746a86;
-}
-body.theme-light .bottom-nav,
-body.theme-light .side-panel,
-body.theme-light .sheet{
-  box-shadow: 0 10px 30px -12px rgba(60,30,80,0.18);
-}
-
-/* Anneau de l'avatar : blanc translucide invisible sur fond clair */
-body.theme-light .avatar-btn{
-  box-shadow: 0 0 0 2px rgba(36,28,51,0.12);
-}
-
-/* Survol des résultats de recherche : trop faible sur panneau blanc */
-body.theme-light .search-result-item:hover{
-  background: rgba(36,28,51,0.045);
-}
-
-/* Cartes de prévisions horaires : le fond violet foncé était codé en dur
-   et ne s'adaptait jamais au thème clair, rendant le texte illisible. */
-body.theme-light .hour-card::before{
-  background:
-    radial-gradient(120% 90% at 15% 0%, rgba(255,255,255,0.7), transparent 55%),
-    linear-gradient(165deg, #ffffff, #f3edf9 75%);
-  border-color: rgba(36,28,51,0.08);
-  filter: drop-shadow(0 10px 18px rgba(60,30,80,0.12));
-}
-body.theme-light .hour-card:hover::before{ border-color: rgba(36,28,51,0.2); }
-
-/* ===========================================================
-   MOBILE (default above ~ up to 600px) fine-tuning
-   =========================================================== */
-@media (max-width: 480px){
-  .temp-value{ font-size: 56px; }
-  .temp-deg{ font-size:24px; }
-  .weather-icon{ width: 150px; height: 150px; right:-8px; bottom:-36px; }
-  .city-name{ font-size: 24px; }
-  .card-mid{ max-width: 58%; }
-}
-
-/* ===========================================================
-   DESKTOP — distinct two-column layout, no phone-frame feel.
-   Sizes use clamp() so everything scales smoothly with the
-   viewport instead of jumping abruptly at the breakpoint, and
-   every component (not just the hero card) is scaled up so the
-   whole page feels proportioned to a large screen.
-   =========================================================== */
-@media (min-width: 900px){
-  body{ padding-top: clamp(48px, 5vw, 64px); align-items:flex-start; }
-
-  .app{
-    max-width: 1360px;
-    padding: 0 clamp(40px, 4vw, 64px) 60px;
-  }
-
-  .topbar{ margin-bottom: clamp(32px, 3vw, 44px); }
-  .search{ max-width: 460px; padding:12px 16px; }
-  .search input{ font-size:15px; }
-  .icon-btn.grid-btn{ width:38px; height:38px; }
-  .avatar-btn{ width:44px; height:44px; font-size:21px; }
-
-  .main-grid{
-    display:grid;
-    grid-template-columns: minmax(420px, 460px) 1fr;
-    grid-template-areas:
-      "card    tabs"
-      "card    toggle"
-      "stats   hourly"
-      "status  hourly";
-    column-gap: clamp(32px, 3vw, 48px);
-    row-gap: 24px;
-    align-items:start;
-  }
-
-  .weather-card{ grid-area: card; }
-  .card-content{ padding: clamp(34px, 3vw, 44px) clamp(30px, 3vw, 38px) 40px; }
-  .city-name{ font-size: clamp(28px, 2.1vw, 32px); }
-  .date{ font-size:14px; }
-  .refresh-btn{ width:42px; height:42px; }
-
-  .stats-strip{ grid-area: stats; flex-direction:column; align-items:flex-start; gap:16px; padding:18px 20px; }
-  .stat-icon{ width:44px; height:44px; border-radius:14px; }
-  .stat-label{ font-size:12px; }
-  .stat-value{ font-size:15px; }
-
-  .city-tabs{ grid-area: tabs; margin-top:0; gap:12px; }
-  .tab{ padding:10px 20px; font-size:15px; }
-  .tab-add{ width:38px; height:38px; font-size:20px; }
-
-  .toggles-row{ grid-area: toggle; margin-top:0; }
-  .day-btn{ font-size:16px; }
-  .res-btn{ padding:7px 16px; font-size:13px; }
-
-  .hourly-carousel{
-    grid-area: hourly;
-    margin-top:0;
-    align-self:start;
-  }
-  .hour-card{ width:108px; padding:18px 10px 16px; }
-  .hour-temp-value{ font-size:32px; }
-  .hour-icon{ width:48px; height:48px; }
-
-  .status-msg{ grid-area: status; text-align:left; font-size:14px; }
-
-  .temp-value{ font-size: clamp(84px, 6vw, 104px); }
-  .temp-deg{ font-size: clamp(30px, 2.4vw, 38px); }
-  .temp-minmax{ font-size:14px; }
-  .weather-icon{ width: clamp(215px, 16vw, 250px); height: clamp(215px, 16vw, 250px); right:-14px; bottom:-58px; }
-
-  /* Settings panel and favorites sheet were sized for a mobile
-     drawer; give them real desktop proportions instead of
-     stretching a narrow mobile panel edge-to-edge. */
-  .side-panel{ width:min(380px, 30vw); padding:32px 28px; }
-  .sheet{
-    left:50%; right:auto; bottom:auto; top:50%;
-    transform: translate(-50%, calc(-50% + 24px));
-    width:min(480px, 90vw);
-    max-height:74vh;
-    border-radius:24px;
-    opacity:0;
-    pointer-events:none;
-    transition: transform 0.3s ease, opacity 0.25s ease;
-  }
-  .sheet.open{ transform: translate(-50%, -50%); opacity:1; pointer-events:auto; }
-
-  .bottom-nav{ display:none; } /* desktop uses a persistent layout, no need for mobile tab bar */
-}
-
-/* ===========================================================
-   LARGE DESKTOP — extra room on big monitors. Capped growth so
-   the layout stays comfortable and doesn't sprawl or feel like
-   a different design; mostly more breathing space, not bigger
-   text everywhere.
-   =========================================================== */
-@media (min-width: 1400px){
-  .app{ max-width: 1480px; }
-  .main-grid{ grid-template-columns: minmax(440px, 480px) 1fr; column-gap:56px; }
-  .hour-card{ width:118px; }
-}
+  justify-content:sp
