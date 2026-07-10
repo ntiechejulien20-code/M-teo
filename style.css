@@ -317,12 +317,14 @@ input{ font-family: inherit; }
   font-family: var(--font-display);
   font-size: 28px;
   font-weight:700;
+  text-shadow: 0 2px 10px rgba(20,6,20,0.28);
 }
 
 .date{
   font-size:13px;
-  opacity:0.85;
+  opacity:0.92;
   margin-top:4px;
+  text-shadow: 0 1px 6px rgba(20,6,20,0.3);
 }
 
 .refresh-btn{
@@ -348,6 +350,7 @@ input{ font-family: inherit; }
   font-size: 72px;
   font-weight:800;
   line-height:1;
+  text-shadow: 0 3px 12px rgba(20,6,20,0.3);
 }
 .temp-deg{
   font-size:30px;
@@ -355,13 +358,15 @@ input{ font-family: inherit; }
   line-height:1;
   margin-top:6px;
   margin-left:2px;
+  text-shadow: 0 3px 12px rgba(20,6,20,0.3);
 }
 
 .temp-minmax{
   font-size:13px;
   font-weight:600;
-  opacity:0.9;
+  opacity:0.95;
   margin-top:6px;
+  text-shadow: 0 1px 6px rgba(20,6,20,0.3);
 }
 
 /* The illustration overflows past the card's bottom-right edge on purpose,
@@ -546,31 +551,32 @@ input{ font-family: inherit; }
 .hour-card{
   position:relative;
   flex-shrink:0;
-  width:92px;
-  padding:16px 8px 14px;
+  width:96px;
+  padding:18px 10px 18px;
   text-align:left;
   transition: transform 0.2s ease;
 }
 .hour-card:hover{ transform: translateY(-4px); }
 
-/* The bubble's colored/glass background, clipped into the chamfered
-   top-right corner shape. Kept as its own layer (rather than putting the
-   clip-path directly on .hour-card) so filter: drop-shadow can cast a
-   shadow that follows the cut shape instead of a plain rectangle. */
+/* Carte "verre dépoli" bleu-nuit : coins uniformément arrondis (plus de
+   chanfrein), reflet glossy en haut à gauche, ombre portée marquée pour
+   un effet flottant proche de la référence. */
 .hour-card::before{
   content:"";
   position:absolute;
   inset:0;
   z-index:0;
-  clip-path: url(#hourNotchClip);
+  border-radius: 26px;
   background:
-    radial-gradient(120% 90% at 15% 0%, rgba(255,255,255,0.14), transparent 55%),
-    linear-gradient(165deg, #2b2438, #1a1522 75%);
-  border:1px solid var(--panel-border);
-  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.35));
+    radial-gradient(140% 90% at 18% 0%, rgba(255,255,255,0.20), transparent 50%),
+    linear-gradient(175deg, #3a4258 0%, #262c3d 55%, #1c2130 100%);
+  border:1px solid rgba(255,255,255,0.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    0 16px 28px -10px rgba(4,4,10,0.6);
   transition: border-color 0.2s ease;
 }
-.hour-card:hover::before{ border-color: rgba(255,255,255,0.18); }
+.hour-card:hover::before{ border-color: rgba(255,255,255,0.22); }
 
 .hour-time{ position:relative; z-index:1; font-size:12px; color: var(--muted); }
 
@@ -838,7 +844,9 @@ body.theme-light .hour-card::before{
     radial-gradient(120% 90% at 15% 0%, rgba(255,255,255,0.7), transparent 55%),
     linear-gradient(165deg, #ffffff, #f3edf9 75%);
   border-color: rgba(36,28,51,0.08);
-  filter: drop-shadow(0 10px 18px rgba(60,30,80,0.12));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    0 14px 24px -10px rgba(60,30,80,0.18);
 }
 body.theme-light .hour-card:hover::before{ border-color: rgba(36,28,51,0.2); }
 
